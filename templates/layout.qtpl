@@ -1,0 +1,21 @@
+{% func Render(content []byte) %}
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.classless.min.css">
+    <style>
+      code {
+        background-color: inherit !important;
+        color: inherit !important;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      {%z= content %}
+    </main>
+  </body>
+</html>
+{% endfunc %}
