@@ -2,10 +2,6 @@
 
 This is the note taking application of JT Archie.
 
-```javascript
-console.log("Hello, World");
-```
+## Example
 
-```ruby
-puts "Hello, World"
-```
+An [example](EXAMPLE) of supported markdown.

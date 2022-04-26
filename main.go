@@ -55,11 +55,9 @@ var _ = formatters.Register(
 )
 
 func renderHookDropCodeBlock(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool) {
-	if n, ok := node.(*ast.CodeBlock); ok {
+	switch n := node.(type) {
+	case *ast.CodeBlock:
 		source := string(n.Literal)
-		log.Printf("source=%q\n", source)
-		log.Printf("source=%#v\n", n)
-
 		_ = quick.Highlight(
 			w,
 			source,
@@ -68,9 +66,9 @@ func renderHookDropCodeBlock(w io.Writer, node ast.Node, entering bool) (ast.Wal
 			"solarized-dark256",
 		)
 		return ast.GoToNext, true
+	default:
+		return ast.GoToNext, false
 	}
-
-	return ast.GoToNext, false
 }
 
 func execute() error {
