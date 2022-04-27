@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -16,6 +17,7 @@ import (
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/ast"
 	mdHTML "github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
 	"github.com/spf13/afero"
 )
 
@@ -64,7 +66,7 @@ func NewRenderer(
 
 func (r *renderer) process() error {
 	opts := mdHTML.RendererOptions{
-		Flags:          mdHTML.CommonFlags,
+		Flags:          mdHTML.CommonFlags | mdHTML.FootnoteReturnLinks,
 		RenderNodeHook: r.renderMarkdownHook,
 	}
 	mdRenderer := mdHTML.NewRenderer(opts)
@@ -82,7 +84,11 @@ func (r *renderer) process() error {
 
 		strippedPath := r.trimPath(markdownFile, r.directory)
 
-		html := markdown.ToHTML(contents, nil, mdRenderer)
+		html := markdown.ToHTML(
+			contents,
+			parser.NewWithExtensions(math.MaxInt32),
+			mdRenderer,
+		)
 		err = afero.WriteFile(
 			r.fs,
 			strippedPath,
