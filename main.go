@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/alexflint/go-arg"
 	"github.com/jtarchie/notes/templates"
@@ -30,7 +31,7 @@ func execute() error {
 		return fmt.Errorf("could not parse arguments: %w", err)
 	}
 
-	renderer, err := NewRenderer(args.Directory, templates.Render)
+	renderer, err := NewLocation(args.Directory, templates.Render)
 	if err != nil {
 		return fmt.Errorf("could not create renderer: %w", err)
 	}
@@ -38,7 +39,15 @@ func execute() error {
 	e := echo.New()
 	e.Use(middleware.Logger())
 
-	e.GET("/*", echo.WrapHandler(renderer))
+	e.GET("/*", func(c echo.Context) error {
+		filePath := c.Request().URL.Path
+		doc, err := renderer.GetDoc(filePath)
+		if err != nil {
+			return c.String(http.StatusNotFound, err.Error())
+		}
+
+		return c.HTML(http.StatusOK, doc.ToHTML(templates.Render))
+	})
 
 	err = e.Start(fmt.Sprintf(":%d", args.Port))
 	if err != nil {

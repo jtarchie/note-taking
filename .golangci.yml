@@ -7,7 +7,6 @@ linters:
   - depguard
   - errcheck
   - exportloopref
-  - gochecknoinits
   - gocritic
   - gocyclo
   - gofmt
