@@ -6,6 +6,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"regexp"
 
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
@@ -17,10 +18,17 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
+type Metadata struct {
+	Title      string
+	Confluence struct {
+		Section string
+	}
+}
+
 type Doc struct {
 	contents []byte
 	filename string
-	metadata map[string]string
+	metadata *Metadata
 	markdown []byte
 }
 
@@ -54,12 +62,16 @@ func NewDoc(filename string) (*Doc, error) {
 }
 
 func (d *Doc) Markdown() []byte {
+	if d.markdown != nil {
+		return d.markdown
+	}
+
 	index := bytes.Index(d.contents, []byte("---\n"))
 	if index >= 0 {
-		var metadata map[string]string
+		metadata := &Metadata{}
 
 		possibleYAML := d.contents[:index]
-		err := yaml.Unmarshal(possibleYAML, &metadata)
+		err := yaml.Unmarshal(possibleYAML, metadata)
 		if err == nil {
 			d.metadata = metadata
 			d.markdown = d.contents[index+4:]
@@ -85,4 +97,20 @@ func (d *Doc) ToHTML(layout func([]byte) string) string {
 	)
 
 	return layout(html)
+}
+
+func (d *Doc) Title() string {
+	if d.metadata != nil {
+		if title := d.metadata.Title; title != "" {
+			return title
+		}
+	}
+
+	findH1 := regexp.MustCompile(`^#[^#]\s*(.*)\s*\n`)
+	groups := findH1.FindSubmatch(d.Markdown())
+	if groups == nil {
+		return ""
+	} else {
+		return string(groups[1])
+	}
 }
