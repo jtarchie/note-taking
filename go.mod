@@ -7,7 +7,7 @@ require (
 	github.com/alexflint/go-arg v1.4.3
 	github.com/goccy/go-yaml v1.9.5
 	github.com/gomarkdown/markdown v0.0.0-20220510115730-2372b9aa33e5
-	github.com/labstack/echo/v4 v4.7.2
+	github.com/labstack/echo/v4 v4.9.0
 	github.com/valyala/quicktemplate v1.7.0
 )
 
